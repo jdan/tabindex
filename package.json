@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "object-assign": "^2.0.0",
+    "phantomjs": "^1.9.16"
+  }
+}
