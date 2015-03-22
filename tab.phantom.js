@@ -11,35 +11,52 @@ page.open(options.url, function(status) {
 
     setTimeout(function() {
         /**
-         * Returns the active element as an array with the following format:
-         * - tagName
-         * - x coordinate
-         * - y coordinate
-         * - width
-         * - height
-         * - content
-         *
-         * We do this to easily check quality between two items, without
-         * resorting to their querySelectorText, object equality, or some
-         * other metric.
+         * Returns the active element
          */
         var getActiveElement = function() {
             return page.evaluate(function() {
                 var el = document.activeElement;
                 var rect = el.getBoundingClientRect();
-                return [
-                    el.tagName,
-                    rect.left,
-                    rect.top,
-                    rect.width,
-                    rect.height,
-                    el.innerHTML
-                ];
+                return {
+                    tag: el.tagName,
+                    x: rect.left,
+                    y: rect.top,
+                    width: rect.width,
+                    height: rect.height,
+                    content: el.innerHTML
+                };
             });
         };
 
+        /**
+         * Detect if the element has been active before, meaning it has
+         * appeared in the tab order already.
+         *
+         * The API for this admittedly has side-effects.
+         */
+        var _idx = {};
+        var elementHasBeenActive = function(el) {
+            // Hash the element
+            var key = [
+                el.tag,
+                el.x,
+                el.y,
+                el.width,
+                el.height
+            ].toString();
+
+            // If we have seen it before, return true
+            if (_idx[key]) {
+                return true;
+
+            // Otherwise, store it (side-effect !!) and return false
+            } else {
+                _idx[key] = true;
+                return false;
+            }
+        }
+
         var elements = [];
-        var seenElements = {};
         var el;
 
         // Loop until we hit the same one or <body>
@@ -50,20 +67,10 @@ page.open(options.url, function(status) {
 
             // Our schema for active elements hashes easily, so we can check
             // if we have seen it before
-            if (seenElements[el] || el[0] === 'BODY') {
+            if (elementHasBeenActive(el) || el.tag === 'BODY') {
                 break;
             } else {
-                seenElements[el] = true;
-
-                // Push in a cleaner format
-                elements.push({
-                    tag: el[0],
-                    x: el[1],
-                    y: el[2],
-                    width: el[3],
-                    height: el[4],
-                    contnet: el[5]
-                });
+                elements.push(el);
             }
         }
 
