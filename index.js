@@ -3,7 +3,7 @@ var objectAssign = require("object-assign");
 var path = require("path");
 var phantomjs = require("phantomjs");
 
-function run(url, options, cb) {
+module.exports = function(url, options, cb) {
     options = objectAssign({
         delay: 3000,
         width: 1024,
@@ -21,11 +21,3 @@ function run(url, options, cb) {
         }
     });
 };
-
-run("http://localhost:3000", {delay: 0}, function(err, data) {
-    if (err) {
-        return console.log("Error:", err);
-    }
-
-    console.log(data);
-});

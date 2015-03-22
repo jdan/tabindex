@@ -2,7 +2,7 @@ var system = require("system");
 var page = require("webpage").create();
 var options = JSON.parse(system.args[1]);
 
-page.viewportSize = { width: options.width, height: 200 };
+page.viewportSize = { width: options.width, height: 10000 };
 page.open(options.url, function(status) {
     if (status === 'fail') {
         system.stderr.writeLine('Couldn\'t load url: ' + url);
