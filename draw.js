@@ -43,7 +43,10 @@ module.exports = function(els, width, height, outputFile, scale) {
     scale = scale || 0.5;
     outputFile = outputFile || "tab.gif";
 
-    var encoder = new GIFEncoder(width, height);
+    var scaledWidth = Math.floor(scale * width);
+    var scaledHeight = Math.floor(scale * height);
+
+    var encoder = new GIFEncoder(scaledWidth, scaledHeight);
     encoder.createReadStream().pipe(fs.createWriteStream(outputFile));
 
     encoder.start();
@@ -52,11 +55,11 @@ module.exports = function(els, width, height, outputFile, scale) {
     encoder.setQuality(10); // image quality. 10 is default.
 
     els.forEach(function(el) {
-        encoder.addFrame(drawFrame(width, height, {
-            x: el.x,
-            y: el.y,
-            width: el.width,
-            height: el.height
+        encoder.addFrame(drawFrame(scaledWidth, scaledHeight, {
+            x: Math.floor(el.x * scale),
+            y: Math.floor(el.y * scale),
+            width: Math.floor(el.width * scale),
+            height: Math.floor(el.height * scale)
         }));
     });
 
