@@ -9,65 +9,63 @@ page.open(options.url, function(status) {
         phantom.exit(1);
     }
 
-    setTimeout(function() {
-        /**
-         * Returns the active element
-         */
-        var getActiveElement = function() {
-            return page.evaluate(function() {
-                var el = document.activeElement;
-                var rect = el.getBoundingClientRect();
-                return {
-                    tag: el.tagName,
-                    x: rect.left,
-                    y: rect.top,
-                    width: rect.width,
-                    height: rect.height,
-                    content: el.innerHTML
-                };
-            });
-        };
+    /**
+     * Returns the active element
+     */
+    var getActiveElement = function() {
+        return page.evaluate(function() {
+            var el = document.activeElement;
+            var rect = el.getBoundingClientRect();
+            return {
+                tag: el.tagName,
+                x: rect.left,
+                y: rect.top,
+                width: rect.width,
+                height: rect.height,
+                content: el.innerHTML
+            };
+        });
+    };
 
-        /**
-         * Detect if the element has been active before, meaning it has
-         * appeared in the tab order already.
-         *
-         * The API for this admittedly has side-effects.
-         */
-        var _idx = {};
-        var elementHasBeenActive = function(el) {
-            // Hash the element
-            var key = [
-                el.tag,
-                el.x,
-                el.y,
-                el.width,
-                el.height
-            ].toString();
+    /**
+     * Detect if the element has been active before, meaning it has
+     * appeared in the tab order already.
+     *
+     * The API for this admittedly has side-effects.
+     */
+    var _idx = {};
+    var elementHasBeenActive = function(el) {
+        // Hash the element
+        var key = [
+            el.tag,
+            el.x,
+            el.y,
+            el.width,
+            el.height
+        ].toString();
 
-            // If we have seen it before, return true
-            if (_idx[key]) {
-                return true;
+        // If we have seen it before, return true
+        if (_idx[key]) {
+            return true;
 
-            // Otherwise, store it (side-effect !!) and return false
-            } else {
-                _idx[key] = true;
-                return false;
-            }
+        // Otherwise, store it (side-effect !!) and return false
+        } else {
+            _idx[key] = true;
+            return false;
         }
+    };
 
+    setTimeout(function() {
         var elements = [];
         var el;
 
-        // Loop until we hit the same one or <body>
         while (1) {
             // Simulate the press of a tab key
             page.sendEvent('keypress', page.event.key.Tab);
             el = getActiveElement();
 
-            // Our schema for active elements hashes easily, so we can check
-            // if we have seen it before
-            if (elementHasBeenActive(el) || el.tag === 'BODY') {
+            // Break if we have seen the element before, or if it's the BODY
+            if (el.tag === 'BODY' || elementHasBeenActive(el)) {
                 break;
             } else {
                 elements.push(el);
