@@ -72,8 +72,22 @@ page.open(options.url, function(status) {
             }
         }
 
+        var bodyWidth = page.evaluate(function() {
+            return document.body.offsetWidth;
+        });
+        var bodyHeight = page.evaluate(function() {
+            return document.body.offsetHeight;
+        });
+
         // Send back to node
-        console.log(JSON.stringify(elements));
+        // - The tab order of elements (as defined above)
+        // - The width of the body
+        // - The height of the body
+        console.log(JSON.stringify({
+            tabOrder: elements,
+            width: bodyWidth,
+            height: bodyHeight
+        }));
         phantom.exit();
 
     }, options.delay);

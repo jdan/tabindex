@@ -17,7 +17,7 @@ function drawFrame(width, height, el, cb) {
         }
 
         if (row >= el.y && row < el.y + el.height) {
-            for (i = el.x; i < el.x + el.width * 4; i += 4) {
+            for (i = el.x*4; i < el.x*4 + el.width*4; i += 4) {
                 rowData[ i ] = 0;
                 rowData[i+1] = 0;
                 rowData[i+2] = 0;
@@ -31,25 +31,34 @@ function drawFrame(width, height, el, cb) {
     return byteData;
 }
 
-module.exports = function() {
-    var encoder = new GIFEncoder(100, 100);
-    encoder.createReadStream().pipe(fs.createWriteStream('myanimated.gif'));
+/**
+ * Renders a GIF of a given tab order represented by:
+ * - an array of elements
+ * - document width
+ * - document height
+ * - output file (default: tab.gif)
+ * - scale parameter (default 0.5)
+ */
+module.exports = function(els, width, height, outputFile, scale) {
+    scale = scale || 0.5;
+    outputFile = outputFile || "tab.gif";
+
+    var encoder = new GIFEncoder(width, height);
+    encoder.createReadStream().pipe(fs.createWriteStream(outputFile));
 
     encoder.start();
     encoder.setRepeat(0);   // 0 for repeat, -1 for no-repeat
-    encoder.setDelay(100);  // frame delay in ms
+    encoder.setDelay(200);  // frame delay in ms
     encoder.setQuality(10); // image quality. 10 is default.
 
-    for (var i = 0; i < 10; i++) {
-        encoder.addFrame(drawFrame(100, 100, {
-            x: Math.floor(Math.random() * 50),
-            y: Math.floor(Math.random() * 50),
-            width: 20,
-            height: 20
+    els.forEach(function(el) {
+        encoder.addFrame(drawFrame(width, height, {
+            x: el.x,
+            y: el.y,
+            width: el.width,
+            height: el.height
         }));
-    }
+    });
 
     encoder.finish();
 };
-
-run();
