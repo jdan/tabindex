@@ -4,5 +4,31 @@
     "meow": "^3.1.0",
     "object-assign": "^2.0.0",
     "phantomjs": "^1.9.16"
-  }
+  },
+  "name": "tabindex",
+  "description": "tab order visualization tool",
+  "version": "0.0.1",
+  "main": "index.js",
+  "devDependencies": {},
+  "bin": {
+    "tab": "cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jdan/tabindex.git"
+  },
+  "keywords": [
+    "a11y",
+    "tabindex",
+    "tab"
+  ],
+  "author": "Jordan Scales <scalesjordan@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jdan/tabindex/issues"
+  },
+  "homepage": "https://github.com/jdan/tabindex"
 }
